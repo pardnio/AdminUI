@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文章撰寫 - AdminUI 靜態範例</title>
+
+    <!-- 預連接 -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- 預加載 Google Fonts -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&family=Noto+Sans+TC:wght@400&display=swap"
+      as="style"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&family=Noto+Sans+TC:wght@400&display=swap"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+
+    <!-- 預加載 Font Awesome 圖示 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" as="style" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" crossorigin="anonymous" />
+
+    <!-- 預加載 QuickUI 前端框架 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" as="script" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" defer crossorigin="anonymous"></script>
+
+    <!-- 預加載 NanoMD 編輯器 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@pardnchiu/nanomd@1.11.1/dist/NanoMD.js" as="script" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/@pardnchiu/nanomd@1.11.1/dist/NanoMD.js" crossorigin="anonymous"></script>
+
+    <!-- 本地資源 -->
+    <link rel="stylesheet" href="./dist/AdminUI.css" />
+    <script src="./dist/AdminUI.js"></script>
+    <script src="./static/js/demo.js"></script>
+  </head>
+
+  <body id="body" :animation="fade-in">
+    <!-- * 純範例用，請直接透過後端渲染 -->
+    <section :if="is_guest" class="login">
+      <temp :path="./component/demo-login.html"></temp>
+    </section>
+    <section :else>
+      <!-- * 左側導覽列 (純範例用，請直接透過後端渲染) -->
+      <temp :path="./component/demo-left-tab.html"></temp>
+      <!-- 內容 -->
+      <section class="system-block-body-right">
+        <!-- * 頂部導覽列 (純範例用，請直接透過後端渲染) -->
+        <temp :path="./component/demo-right-nav.html"></temp>
+        <!-- -->
+        <header>
+          <strong>文章撰寫</strong>
+          <section></section>
+        </header>
+        <!--  -->
+        <section class="system-page-article" data-fill="0">
+          <section>
+            <!--  -->
+            <details>
+              <!--  -->
+              <summary>
+                <span>文章資訊 <i class="fa-solid fa-caret-right"></i></span>
+                <section>
+                  <button>
+                    <i class="fa-brands fa-firstdraft"></i>
+                    草稿
+                  </button>
+                  <button>
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    發布
+                  </button>
+                </section>
+              </summary>
+              <!--  -->
+              <section>
+                <form id="input-form" class="system-component-form">
+                  <span>基本設定</span>
+                  <label class="_50" title="自訂 ID" data-hint="@username/[自訂 ID]">
+                    <section>
+                      <textarea name="description" placeholder="自訂 ID" data-type="text" data-wrap="0" @input="textInput"></textarea>
+                      <pre></pre>
+                    </section>
+                  </label>
+                  <label class="_50" title="分類" data-hint="">
+                    <section>
+                      <select name="" id="">
+                        <option value="">選擇類別</option>
+                        <option value="">類別1</option>
+                        <option value="">類別2</option>
+                      </select>
+                      or
+                      <input type="text" placeholder="輸入類別" />
+                    </section>
+                  </label>
+                  <label title="標題" data-hint="高度自增長輸入框 (不支持換行)">
+                    <section>
+                      <textarea name="single-line" placeholder="標題" data-required="1" data-type="text" data-wrap="0" @input="textInput"></textarea>
+                      <pre></pre>
+                    </section>
+                  </label>
+                  <label title="描述" data-hint="高度自增長輸入框 (不支持換行)">
+                    <section>
+                      <textarea name="description" placeholder="描述" data-type="text" data-wrap="0" @input="textInput"></textarea>
+                      <pre></pre>
+                    </section>
+                  </label>
+                  <label title="標籤" data-hint="高度自增長輸入框 (標籤不支持換行, 點擊 Enter 自動轉換)">
+                    <section>
+                      <textarea name="hashtag" placeholder="標籤" data-type="text" @input="textInput" @keyup="tagkeyup"></textarea>
+                      <pre></pre>
+                    </section>
+                  </label>
+                  <span>SEO 設定</span>
+                  <label title="SEO 標題" data-hint="高度自增長輸入框 (不支持換行)">
+                    <section>
+                      <textarea name="seo-title" placeholder="SEO 標題" data-type="text" data-wrap="0" @input="textInput"></textarea>
+                      <pre></pre>
+                    </section>
+                  </label>
+                  <label title="SEO 描述" data-hint="高度自增長輸入框 (不支持換行)">
+                    <section>
+                      <textarea name="single-line" placeholder="SEO 描述" data-type="text" data-wrap="0" @input="textInput"></textarea>
+                      <pre></pre>
+                    </section>
+                  </label>
+                </form>
+              </section>
+            </details>
+            <!--  -->
+            <section>
+              <section class="system-page-article-editor">
+                <section id="article-editor"></section>
+              </section>
+              <section class="system-page-article-viewer">
+                <section id="article-viewer"></section>
+              </section>
+            </section>
+          </section>
+          <!--  -->
+          <button @click="expand">
+            <i class="fa-solid fa-expand"></i>
+            <i class="fa-solid fa-compress"></i>
+          </button>
+        </section>
+      </section>
+    </section>
+    <script>
+      document.addEventListener("DOMContentLoaded", (_) => {
+        // * 純範例用，請直接透過後端渲染
+        demo_datas.left.is_demo_article_editor = 1;
+
+        page = new QUI({
+          id: "body",
+          data: {
+            // * 純範例用，請直接透過後端渲染
+            ...demo_datas,
+          },
+          event: {
+            // * 純範例用，請直接透過後端渲染
+            ...demo_events,
+            ...system_events,
+            textInput,
+            expand: (e) => {
+              const _this = e.target;
+              const parent = _this.parentElement;
+              const bodyLeft = document.querySelector("section.system-block-body-left");
+              const isMin = parseInt(bodyLeft.dataset.min);
+
+              parent.dataset.fill = Math.abs(parseInt(parent.dataset.fill) - 1);
+
+              if (parent.dataset.fill === "1" && !isMin) {
+                bodyLeft.dataset.min = 1;
+                addCookie("is_body_left_min", 1);
+              }
+            },
+            tagInput: (e) => {
+              const _this = e.target;
+              _this.value = _this.value.replace(/\n/g, "");
+              _this.nextElementSibling.innerHTML = _this.value.replace(/\n/g, "<br>");
+            },
+            tagkeyup: (e) => {
+              if (e.key !== "Enter") {
+                return;
+              }
+
+              const _this = e.target;
+              const regex = /[#＃\,，\n\ ]+([\w\u4e00-\u9fa5\u3105-\u3129\u31A0-\u31B7\u3040-\u30FF\u3130-\u318F\uAC00-\uD7AF]+)/g;
+              let ary = (_this.value || "").match(regex) || _this.value.split(/\s/);
+              let map = new Map();
+
+              if (ary.length < 1) {
+                return;
+              }
+
+              for (let i = 0, e = ary[i]; i < ary.length; i++, e = ary[i]) {
+                const hashtag = e.replace(/[#＃\,，\n\ ]/g, "").slice(0, 24);
+
+                if (hashtag.length < 2) {
+                  continue;
+                }
+
+                map.set(hashtag, 0);
+              }
+
+              let keys = Array.from(map.keys());
+
+              if (keys.length > 0) {
+                _this.value = `#${keys.join(" #")} #`.trim();
+                _this.nextElementSibling.innerHTML = _this.value.replace(/\n/g, "<br>");
+              } else {
+                _this.value = "#";
+                _this.nextElementSibling.innerHTML = "#";
+              }
+            },
+            descriptionInput: (e) => {
+              const _this = e.target;
+              _this.value = _this.value.replace(/\n/g, "");
+              _this.nextElementSibling.innerHTML = _this.value.replace(/\n/g, "<br>");
+            },
+          },
+          when: {
+            rendered: async (_) => {
+              // * 純範例用，請直接透過後端渲染
+              let text;
+              await fetch("/README.md")
+                .then((response) => response.text())
+                .then((data) => {
+                  text = data;
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+
+              const elm_editor = new MDEditor({
+                id: "article-editor",
+                defaultContent: text,
+                showRow: 0,
+                hotKey: 1, // 啟用快捷鍵，預設為 1
+                // preventRefresh: 1,                   // 防止頁面重整，預設值：0
+                tabPin: 1, // 啟用 Tab 縮排，預設值：0 (關閉)
+                wrap: 1, // 啟用文字自動換行，預設值：1 (開啟)
+                autoSave: 1, // 自動儲存，預設值：1 (開啟)
+                event: {
+                  save: (result) => {
+                    // 自定義儲存事件
+                    console.log(result); // 輸出當前 Markdown 內容
+                  },
+                  upload: (result) => {
+                    // 自定義儲存事件
+                    console.log(result); // 輸出當前 Markdown 內容
+                  },
+                },
+                style: {
+                  fill: 1, // 隨父元素大小調整，預設值：1
+                  placeholder: {
+                    text: "Content", // 設定提示文字，預設：Type here ...
+                    color: "#0000ff80", // 提示文字顏色，預設：#0000ff1a
+                  },
+                },
+              });
+
+              const elm_viewer = new MDViewer({
+                id: "article-viewer",
+                style: {
+                  fill: 1, // 隨父元素大小調整，預設值：1 | true
+                },
+                sync: {
+                  editor: elm_editor, // 關聯的編輯器
+                  delay: 50, // 更新延遲，單位ms，預設 300
+                  scrollSync: 1, // 與編輯器同步滾動，預設值：0 | false
+                },
+              });
+            },
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

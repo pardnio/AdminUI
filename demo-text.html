@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文檔編輯 - AdminUI 靜態範例</title>
+
+    <!-- 預連接 -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- 預加載 Google Fonts -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&family=Noto+Sans+TC:wght@400&display=swap"
+      as="style"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&family=Noto+Sans+TC:wght@400&display=swap"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+
+    <!-- 預加載 Font Awesome 圖示 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" as="style" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" crossorigin="anonymous" />
+
+    <!-- 預加載 QuickUI 前端框架 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" as="script" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" defer crossorigin="anonymous"></script>
+
+    <!-- 本地資源 -->
+    <link rel="stylesheet" href="./dist/AdminUI.css" />
+    <script src="./dist/AdminUI.js"></script>
+    <script src="./static/js/demo.js"></script>
+  </head>
+
+  <body id="body" :animation="fade-in">
+    <!-- * 純範例用，請直接透過後端渲染 -->
+    <section :if="is_guest" class="login">
+      <temp :path="./component/demo-login.html"></temp>
+    </section>
+    <section :else>
+      <!-- * 左側導覽列 (純範例用，請直接透過後端渲染) -->
+      <temp :path="./component/demo-left-tab.html"></temp>
+      <!-- 內容 -->
+      <section class="system-block-body-right">
+        <!-- * 頂部導覽列 (純範例用，請直接透過後端渲染) -->
+        <temp :path="./component/demo-right-nav.html"></temp>
+        <!--  -->
+        <section class="system-page-text">
+          <section>
+            <header>
+              <span>目前位置: {{ path }}</span>
+              <section>
+                <button>
+                  <i class="fa-solid fa-trash-can"></i>
+                  刪除
+                </button>
+              </section>
+            </header>
+            <!--  -->
+            <section>
+              <textarea id="TextEditor" oninput="this.nextElementSibling.innerHTML = this.value.replace(/\n/g, '<br>')"></textarea>
+              <pre></pre>
+            </section>
+          </section>
+        </section>
+      </section>
+    </section>
+    <script>
+      document.addEventListener("DOMContentLoaded", async (_) => {
+        const url = new URL(location.href);
+        const query = url.searchParams;
+        const path = query.get("path");
+        let previous = "/static/demo";
+
+        // * 純範例用，請直接透過後端渲染
+        let text;
+        await fetch(path)
+          .then((response) => response.text())
+          .then((data) => {
+            text = data;
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
+        demo_datas.left.is_demo_text = 1;
+
+        page = new QUI({
+          id: "body",
+          data: {
+            // * 純範例用，請直接透過後端渲染
+            ...demo_datas,
+            isChild: path === previous,
+            path,
+          },
+          event: {
+            // * 純範例用，請直接透過後端渲染
+            ...demo_events,
+            ...system_events,
+          },
+          when: {
+            rendered: (_) => {
+              let dom = document.getElementById("TextEditor");
+              dom.value = text;
+              dom.nextElementSibling.innerHTML = text.replace(/\n/g, "<br>");
+            },
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="zh-hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>資料列表 - AdminUI 靜態範例</title>
+
+    <!-- 預連接 -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- 預加載 Google Fonts -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&family=Noto+Sans+TC:wght@400&display=swap"
+      as="style"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&family=Noto+Sans+TC:wght@400&display=swap"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+
+    <!-- 預加載 Font Awesome 圖示 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" as="style" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" crossorigin="anonymous" />
+
+    <!-- 預加載 QuickUI 前端框架 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" as="script" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" defer crossorigin="anonymous"></script>
+
+    <!-- 本地資源 -->
+    <link rel="stylesheet" href="./dist/AdminUI.css" />
+    <script src="./dist/AdminUI.js"></script>
+    <script src="./static/js/demo.js"></script>
+  </head>
+
+  <body id="body" :animation="fade-in">
+    <!-- * 純範例用，請直接透過後端渲染 -->
+    <section :if="is_guest" class="login">
+      <temp :path="./component/demo-login.html"></temp>
+    </section>
+    <section :else>
+      <!-- * 左側導覽列 (純範例用，請直接透過後端渲染) -->
+      <temp :path="./component/demo-left-tab.html"></temp>
+      <!-- 內容 -->
+      <section class="system-block-body-right">
+        <!-- * 頂部導覽列 (純範例用，請直接透過後端渲染) -->
+        <temp :path="./component/demo-right-nav.html"></temp>
+        <!-- -->
+        <header>
+          <strong>資料列表</strong>
+          <section>
+            <!-- 可以放按鈕 -->
+            <!-- <button>
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            篩選
+                        </button> -->
+          </section>
+        </header>
+        <!-- 資料庫 -->
+        <section class="system-page-data-list">
+          <section>
+            <details open>
+              <summary>
+                <span>篩選條件 <i class="fa-solid fa-caret-right"></i></span>
+                <section>
+                  <!-- 可以放按鈕 -->
+                  <button @click="add_filter">
+                    <i class="fa-solid fa-circle-plus"></i>
+                    添加
+                  </button>
+                  <button @click="clear_filter">
+                    <i class="fa-solid fa-eraser"></i>
+                    清除
+                  </button>
+                  <button @click="send_filter">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    送出
+                  </button>
+                </section>
+              </summary>
+              <section data-row="1">
+                <form :for="a in filter">
+                  <button type="button" @click="remove_filter">
+                    <i class="fa-solid fa-circle-minus"></i>
+                  </button>
+                  <select name="key" @change="key_change">
+                    <option value="a.key"></option>
+                    <option :for="e in database.head" :value="e.key">{{ e.title }}</option>
+                  </select>
+                  <select name="compare" @change="compare_change">
+                    <option value=""></option>
+                    <option :for="e in database.compare" :value="e.key">{{ e.title }}</option>
+                  </select>
+                  <input type="text" name="value" placeholder="值" :value="a.value" @change="value_change" />
+                </form>
+              </section>
+            </details>
+            <!-- 列表 -->
+            <section>
+              <table data-head="1">
+                <thead>
+                  <tr>
+                    <th :for="e in database.head">{{ e.title }}</th>
+                    <th>其他</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr :class="e.class" :for="e in database.list">
+                    <td :for="a in e.body" :html="a"></td>
+                    <td>
+                      <button>編輯</button>
+                      <button class="alert" :if="e.is_deleted == false">刪除</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+          </section>
+          <!-- 按鈕 -->
+          <footer>
+            <section>
+              <a href="" user-select="0">上一頁</a>
+              <a href="" user-select="0">下一頁</a>
+            </section>
+            <section>
+              <p user-select="0">顯示</p>
+              <select name="" id="">
+                <option value="">10</option>
+                <option value="">50</option>
+              </select>
+              <p user-select="0">結果</p>
+            </section>
+          </footer>
+        </section>
+      </section>
+    </section>
+    <script>
+      document.addEventListener("DOMContentLoaded", (_) => {
+        let timer;
+
+        demo_datas.left.is_database_list = 1;
+
+        page = new QUI({
+          id: "body",
+          data: {
+            // 純範例用，請直接透過後端渲染
+            ...demo_datas,
+            filter: [],
+            // 資料列表
+            database: {
+              compare: [
+                { title: "等於", key: "equalTo" },
+                { title: "大於", key: "greaterThan" },
+                { title: "大於等於", key: "greaterThanOrEqualTo" },
+                { title: "小於", key: "lessThan" },
+                { title: "小於等於", key: "lessThanOrEqualto" },
+                { title: "包含", key: "contains" },
+              ],
+              head: [
+                { title: "SN", key: "sn" },
+                { title: "自訂ID", key: "uni" },
+                { title: "標題", key: "title" },
+                { title: "副標題", key: "subtitle" },
+                { title: "內容", key: "content" },
+                { title: "上傳", key: "upload" },
+                { title: "更新", key: "updated" },
+                { title: "觀看", key: "watch" },
+                { title: "留言", key: "comment" },
+              ],
+              list: [
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "1",
+                    "<a href='https://pardn.io/blog/nodejs-install' target='_blank'>nodejs-install</a>",
+                    "Node.js: JavaScript 的後端魔法",
+                    "Node.js: JavaScript 的後端魔法 (1)",
+                    "> 歡迎來到 Node.js，一個開發者的熱門後端語言選擇，這是建構高效伺服器端應用程式的理想平台。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "2",
+                    "<a href='https://pardn.io/blog/nodejs-promise-async' target='_blank'>nodejs-promise-async</a>",
+                    "Promise 與 Async/Await 的非同步設計",
+                    "Node.js: JavaScript 的後端魔法 (2)",
+                    "> 非同步程式設計、事件驅動、Promises 以 及Async/Await 是Node.js強大的支柱。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "3",
+                    "<a href='https://pardn.io/blog/nodejs-hello-world' target='_blank'>nodejs-hello-world</a>",
+                    "建立第一個 Node.js 應用程式有多難？",
+                    "Node.js: JavaScript 的後端魔法 (3)",
+                    "> 我們將帶你踏上 Node.js 的奇妙旅程。透過簡單易懂的步驟，你將學會如何創建一個基本的 HTTP 伺服器，處理請求與回應，以及實作基本的路由設定。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "4",
+                    "<a href='https://pardn.io/blog/nodejs-express' target='_blank'>nodejs-express</a>",
+                    "什麼？Express 竟然如此的好用",
+                    "Node.js: JavaScript 的後端魔法 (4)",
+                    "> Express 是一個快速、靈活且簡潔的 Node.js 框架，專為構建 Web 應用程式和 API 而設計，如路由、模板引擎、中介軟體等。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "5",
+                    "<a href='https://pardn.io/blog/nodejs-mongodb-mysql' target='_blank'>nodejs-mongodb-mysql</a>",
+                    "前進資料庫! MongoDB 與 MySQL",
+                    "Node.js: JavaScript 的後端魔法 (5)",
+                    "> 本篇文章我們將討論兩個主要的資料庫選擇:NoSQL 的 MongoDB 和關聯式資料庫的 MySQL。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "6",
+                    "<a href='https://pardn.io/blog/nodejs-middleware' target='_blank'>nodejs-middleware</a>",
+                    "中介軟體 (Middleware) 與定制流程",
+                    "Node.js: JavaScript 的後端魔法 (6)",
+                    "> 在 Express 中，中介軟體 (Middleware) 是一個強大的功能，它允許我們在請求和回應之間執行功能。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "7",
+                    "<a href='https://pardn.io/blog/nodejs-pug-ejs' target='_blank'>nodejs-pug-ejs</a>",
+                    "服務端渲染 (SSR) 的救星！Pug 與 EJS",
+                    "Node.js: JavaScript 的後端魔法 (7)",
+                    "> 模板引擎是一種強大的工具，允許我們直接從後端動態生成 HTML並傳遞至前端顯示。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "8",
+                    "<a href='https://pardn.io/blog/nodejs-jwt-xss-csp' target='_blank'>nodejs-jwt-xss-csp</a>",
+                    "實作 JWT 會員登入以及防範SQL注入與XSS攻擊",
+                    "Node.js: JavaScript 的後端魔法 (8)",
+                    "> 在現代 Web 開發中，保障使用者身分的安全性是一個至關重要的課題。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "9",
+                    "<a href='https://pardn.io/blog/nodejs-restful-api' target='_blank'>nodejs-restful-api</a>",
+                    "RESTful API 該怎麼設計？",
+                    "Node.js: JavaScript 的後端魔法 (9)",
+                    "> RESTful API 是一種設計風格，旨在促進資源的有效管理和互動。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                {
+                  class: "",
+                  is_deleted: false,
+                  body: [
+                    "10",
+                    "<a href='https://pardn.io/blog/nodejs-mocha-supertest' target='_blank'>nodejs-mocha-supertest</a>",
+                    "Mocha？Supertest？單元與整合測試？",
+                    "Node.js: JavaScript 的後端魔法 (10)",
+                    "> 在軟體開發生命週期中，測試佔據了至關重要的地位，有助於確保代碼的正確性、可靠性和穩定性。",
+                    "1天前",
+                    "",
+                    "30",
+                    "1",
+                  ],
+                },
+                // {
+                //     class: "info",
+                //     is_deleted: false,
+                //     body: ["2", "陳曉華", "B123456789", "0912345678", "mail@pardnltd (尚未驗證)"]
+                // },
+                // {
+                //     class: "hide",
+                //     is_deleted: true,
+                //     body: ["3", "吳忠志", "C123456789", "0912345678", "<a href='mailto:mail@pardnltd'>mail@pardnltd</a>"]
+                // },
+              ],
+            },
+          },
+          event: {
+            // * 純範例用，請直接透過後端渲染
+            ...demo_events,
+            ...system_events,
+            send_filter: (e) => {
+              console.log(page.data.filter.filter((e) => e.key.length && e.compare.length));
+            },
+            clear_filter: (e) => {
+              page.data.filter = [];
+            },
+            add_filter: (e) => {
+              e.target.disabled = true;
+              page.data.filter.push({ key: "", compare: "", value: "" });
+
+              clearTimeout(timer);
+              timer = setTimeout((_) => {
+                e.target.disabled = false;
+              }, 500);
+            },
+            remove_filter: (e) => {
+              let index = Array.prototype.indexOf.call(e.target.parentElement.parentElement.children, e.target.parentElement);
+
+              page.data.filter.splice(index, 1);
+
+              clearTimeout(timer);
+              timer = setTimeout((_) => {
+                e.target.disabled = false;
+              }, 500);
+            },
+            key_change: (e) => {
+              let index = Array.prototype.indexOf.call(e.target.parentElement.parentElement.children, e.target.parentElement);
+
+              let obj = {};
+              new FormData(e.target.parentElement).forEach((value, key) => {
+                obj[key] = value;
+              });
+
+              page.data.filter[index] = obj;
+            },
+            compare_change: (e) => {
+              let index = Array.prototype.indexOf.call(e.target.parentElement.parentElement.children, e.target.parentElement);
+
+              let obj = {};
+              new FormData(e.target.parentElement).forEach((value, key) => {
+                obj[key] = value;
+              });
+
+              page.data.filter[index] = obj;
+            },
+            value_change: (e) => {
+              let index = Array.prototype.indexOf.call(e.target.parentElement.parentElement.children, e.target.parentElement);
+
+              let obj = {};
+              new FormData(e.target.parentElement).forEach((value, key) => {
+                obj[key] = value;
+              });
+
+              page.data.filter[index] = obj;
+            },
+          },
+          when: {
+            rendered: (_) => {},
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

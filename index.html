@@ -1,70 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>用戶列表</title>
 
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>用戶列表</title>
+    <!-- 預連接到 cdn.jsdelivr.net -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net/" />
 
-        <!-- 預連接到 cdn.jsdelivr.net -->
-        <link rel="preconnect" href="https://cdn.jsdelivr.net/">
+    <!-- 預加載 Font Awesome 圖示 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" as="style" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" crossorigin="anonymous" />
 
-        <!-- 預加載 Font Awesome 圖示 -->
-        <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" as="style" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" crossorigin="anonymous">
+    <!-- 預加載 QuickUI 前端框架 -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" as="script" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" defer crossorigin="anonymous"></script>
 
-        <!-- 預加載 QuickUI 前端框架 -->
-        <link rel="preload" href="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" as="script" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/@pardnchiu/quickui@0.6.6/dist/QuickUI.js" defer crossorigin="anonymous"></script>
+    <!-- 本地資源 -->
+    <link rel="stylesheet" href="./dist/AdminUI.css" />
+    <script src="./dist/AdminUI.js"></script>
+    <script src="./static/js/demo.js"></script>
+  </head>
 
-        <!-- 本地資源 -->
-        <link rel="stylesheet" href="/dist/AdminUI.css">
-        <script src="/dist/AdminUI.js"></script>
-        <script src="/static/js/demo.js"></script>
-    </head>
-
-    <body id="body" :animation="fade-in">
-        <!-- * 純範例用，請直接透過後端渲染 -->
-        <section :if="is_guest" class="login">
-            <temp :path="/page/component/demo-login.html"></temp>
-        </section>
-        <section :else>
-            <!-- * 左側導覽列 (純範例用，請直接透過後端渲染) -->
-            <temp :path="./page/component/demo-left-tab.html"></temp>
-            <!-- 內容 -->
-            <section class="system-block-body-right">
-                <!-- * 頂部導覽列 (純範例用，請直接透過後端渲染) -->
-                <temp :path="./page/component/demo-right-nav.html"></temp>
-                <!-- -->
-                <header>
-                    <strong>入口頁範例</strong>
-                    <section>
-                    </section>
-                </header>
-                <!--  -->
-                <p class="hint">還沒想好放什麼合適</p>
-            </section>
-        </section>
-    </body>
-    <script>
-        document.addEventListener("DOMContentLoaded", _ => {
-
-            page = new QUI({
-                id: "body",
-                data: {
-                    // 純範例用，請直接透過後端渲染
-                    ...demo_datas
-                },
-                event: {
-                    // * 純範例用，請直接透過後端渲染
-                    ...demo_events,
-                    ...system_events,
-                },
-                next: () => {
-                }
-            });
-        });
-    </script>
-
+  <body id="body" :animation="fade-in">
+    <!-- * 純範例用，請直接透過後端渲染 -->
+    <section :if="is_guest" class="login">
+      <temp :path="./component/demo-login.html"></temp>
+    </section>
+    <section :else>
+      <!-- * 左側導覽列 (純範例用，請直接透過後端渲染) -->
+      <temp :path="./component/demo-left-tab.html"></temp>
+      <!-- 內容 -->
+      <section class="system-block-body-right">
+        <!-- * 頂部導覽列 (純範例用，請直接透過後端渲染) -->
+        <temp :path="./component/demo-right-nav.html"></temp>
+        <!-- -->
+        <header>
+          <strong>入口頁範例</strong>
+          <section></section>
+        </header>
+        <!--  -->
+        <p class="hint">還沒想好放什麼合適</p>
+      </section>
+    </section>
+  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", (_) => {
+      page = new QUI({
+        id: "body",
+        data: {
+          // 純範例用，請直接透過後端渲染
+          ...demo_datas,
+        },
+        event: {
+          // * 純範例用，請直接透過後端渲染
+          ...demo_events,
+          ...system_events,
+        },
+        next: () => {},
+      });
+    });
+  </script>
 </html>
